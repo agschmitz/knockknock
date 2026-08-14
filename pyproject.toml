@@ -1,0 +1,103 @@
+[project]
+# Distribution name is knockknock-shrna, not plain "knockknock": an unrelated
+# notification package already owns that name on PyPI. The import package and
+# the CLI command are both plain `knockknock`.
+name = "knockknock-shrna"
+version = "1.0.0"
+description = "KnockKnock — design shRNA guide sequences"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Maximilian Pfisterer" }]
+requires-python = ">=3.10"
+keywords = ["shRNA", "RNAi", "miR30", "bioinformatics", "molecular-biology", "cloning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "biopython>=1.81",
+    "pandas>=2.0",
+    # to_xlsx() writes through xlsxwriter: the column-width and colour-scale
+    # calls in export.py are xlsxwriter-only APIs, not pandas-generic ones.
+    # openpyxl is deliberately NOT here — nothing in the package reads .xlsx;
+    # only the test suite does, to assert on what to_xlsx() wrote. It lives in
+    # the dev extra instead, so users don't install a dependency they never use.
+    "xlsxwriter>=3.1",
+    "typer>=0.9",
+    "rich>=13.0",
+    # 1.0 for App.copy_to_clipboard (OSC 52) — oligo_tui.py's action_copy
+    # sends this *and* shells out to pbcopy/xclip/etc directly, since OSC 52
+    # alone is a no-op on macOS Terminal.app.
+    "textual>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ag-schmitz-gi/knockknock"
+Repository = "https://github.com/ag-schmitz-gi/knockknock"
+Issues = "https://github.com/ag-schmitz-gi/knockknock/issues"
+
+[project.scripts]
+knockknock = "knockknock.cli:app"
+kk = "knockknock.cli:app"
+
+[project.optional-dependencies]
+# openpyxl is a *test* dependency: tests/test_export.py reads back the
+# workbooks to_xlsx() writes. The package itself only ever writes, via
+# xlsxwriter.
+dev = ["pytest>=7.0", "pytest-cov", "pytest-asyncio>=0.23", "openpyxl>=3.1"]
+
+[tool.ruff]
+line-length = 90
+target-version = "py310"
+
+[tool.ruff.lint]
+# E/W  pycodestyle      — PEP 8 layout
+# F    pyflakes         — unused imports/names, undefined names
+# I    isort            — import order and grouping
+# UP   pyupgrade        — modern syntax for the declared target-version
+# B    flake8-bugbear   — likely bugs (mutable defaults, broad excepts, ...)
+# C4   comprehensions   — needless list()/dict() wrapping
+select = ["E", "W", "F", "I", "UP", "B", "C4"]
+ignore = [
+    "E501",  # line length is enforced by the formatter, not the linter
+]
+
+[tool.ruff.lint.per-file-ignores]
+# The CLI must configure SIGPIPE before importing anything that might write to
+# stdout, so its imports legitimately straddle that statement.
+"knockknock/cli.py" = ["E402"]
+
+[tool.pytest.ini_options]
+# tests/test_tui.py drives Textual's async Pilot harness.
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[build-system]
+# setuptools 77 is the first release that understands PEP 639 — the SPDX
+# `license = "MIT"` string and the top-level `license-files` key above. On
+# anything older the build fails outright with "`project.license` must be
+# valid exactly by one definition". This only constrains *building*: the
+# resulting wheel carries Metadata-Version 2.4, which installers have always
+# tolerated (verified installable back to pip 21.3.1).
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["knockknock*"]
+
+[tool.setuptools.package-data]
+# py.typed (PEP 561) tells type checkers the inline annotations in this package
+# are real and should be used. Without the marker, mypy/pyright silently treat
+# every `from knockknock... import ...` in a downstream project as Any.
+# cli_help.txt is the --help body cli.py reads via importlib.resources — must
+# ship with the wheel/sdist or a real install's --help raises FileNotFoundError.
+knockknock = ["data/*.csv", "cli_help.txt", "py.typed"]

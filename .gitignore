@@ -1,0 +1,37 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+.env
+.DS_Store
+
+# Test coverage
+.coverage
+.coverage.*
+htmlcov/
+
+# Editors / IDEs
+.idea/
+.vscode/
+
+# Claude Code local settings (machine-specific; settings.json, if shared
+# project settings are ever added, is intentionally NOT ignored)
+.claude/settings.local.json
+
+# Generated outputs — export.resolve_export_path names these
+# {stem}_{label}_{timestamp}{ext}, e.g. noxo1_oligos_20260812_133203.txt
+# or shRNAs_candidates_20260812_133203.csv. Matches any stem/extension so
+# renamed inputs and new export formats stay covered.
+*_oligos_*.*
+*_candidates_*.*
+shrna_export_*.csv
+shRNAs.csv
+shRNAs.xlsx
+shRNAs.json
+
+scripts/

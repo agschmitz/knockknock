@@ -1,0 +1,17 @@
+Design shRNA guide sequences and, optionally, their cloning oligos.
+
+Scores every possible guide window in an mRNA using position-specific
+efficacy data from Matveeva et al. (2012), then — with --backbone or a
+manual --loop/--adapter-5/--adapter-3 — designs ready-to-order cloning
+oligos for the resulting candidates.
+
+Three ways to run it:
+
+knockknock                          interactive TUI: file picker, then explorer
+
+knockknock targets.fasta [OPTIONS]  score from the command line (the word "run" is optional)
+
+cat targets.fasta | knockknock -    pipe a sequence or FASTA in on stdin
+
+--guide/--batch design oligos directly from a guide you already have,
+without scoring a FASTA at all. Full reference: docs/CLI_MANUAL.md.
