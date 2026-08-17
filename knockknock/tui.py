@@ -625,6 +625,8 @@ class ExploreApp(App):
             table.move_cursor(row=cursor_row)
 
     def action_select_all_filtered(self) -> None:
+        # `_selected` is a set, so re-adding names is a no-op: 'a' can never
+        # double-count a candidate in the "Selected: N" summary.
         for c in self._filtered():
             self._selected.add(c.name)
         self._refresh()
@@ -643,8 +645,9 @@ class ExploreApp(App):
     def _on_top_n_selected(self, n: int | None) -> None:
         if n is None:
             return
-        for c in self._filtered()[:n]:
-            self._selected.add(c.name)
+        # Top-N *replaces* the current selection: clear any prior picks first,
+        # then check the top-ranked rows of the current view.
+        self._selected = {c.name for c in self._filtered()[:n]}
         self._refresh()
 
     def action_help(self) -> None:

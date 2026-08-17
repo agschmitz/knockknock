@@ -591,6 +591,28 @@ async def test_select_top_n_flow(candidates):
         assert app._selected == top_2_names
 
 
+async def test_select_top_n_replaces_prior_selection(candidates):
+    """Top-N *replaces* any pre-existing selection: previously checked rows
+    that rank below the chosen N are unchecked, not kept as a union."""
+    app = ExploreApp(candidates, total_mrnas=1, input_path="test.fa")
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        # Pre-check two candidates that are NOT in the top 2 of the view.
+        assert len(app._filtered()) >= 4
+        app._selected = {c.name for c in app._filtered()[2:4]}
+        app.query_one("#results-table").focus()
+        await pilot.press("n")
+        await pilot.pause()
+
+        modal = app.screen_stack[-1]
+        modal.query_one("#top-n-input").value = "2"
+        await pilot.press("enter")
+        await pilot.pause()
+
+        top_2_names = {c.name for c in app._filtered()[:2]}
+        assert app._selected == top_2_names
+
+
 async def test_select_top_n_invalid_input_cancels(candidates):
     """A non-numeric top-N value dismisses the modal with no selection made,
     rather than crashing or selecting everything."""

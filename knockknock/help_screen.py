@@ -23,7 +23,7 @@ _HELP_MARKDOWN = """\
   space         Toggle selection on the current row
   a             Select all currently-filtered candidates
   Shift+A       Clear all selections
-  n             Select top N candidates from the current view
+  n             Select top N candidates (replaces current selection)
   s             Toggle sort (efficacy ↔ ΔG)
   m             Toggle low complexity motif filter
   t             Toggle "target all inputs" filter
