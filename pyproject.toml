@@ -3,7 +3,7 @@
 # notification package already owns that name on PyPI. The import package and
 # the CLI command are both plain `knockknock`.
 name = "knockknock-shrna"
-version = "1.0.0"
+version = "1.0.1"
 description = "KnockKnock — design shRNA guide sequences"
 readme = "README.md"
 license = "MIT"
