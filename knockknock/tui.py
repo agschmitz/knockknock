@@ -250,6 +250,10 @@ class ExploreApp(App):
     #filter-bar Checkbox {
         width: auto;
     }
+
+    #design-oligos-btn {
+        margin-top: 1;
+    }
     """
 
     BINDINGS = [
@@ -351,6 +355,11 @@ class ExploreApp(App):
                 )
                 yield Checkbox("Sort by ΔG Score", value=False, id="sort-check")
                 yield Checkbox("Target all inputs", value=True, id="target-all-check")
+            with Vertical(classes="filter-group"):
+                yield Static(" ")
+                yield Button(
+                    "Design Oligos", id="design-oligos-btn", variant="primary"
+                )
         # Row break lands between the filter/selection cluster and the
         # actions/app cluster in BINDINGS below — keep them in sync.
         yield TwoRowFooter(row_break="design_oligos")
@@ -687,6 +696,10 @@ class ExploreApp(App):
             names_by_name = {c.name: c for c in self._all_candidates}
             candidates = [names_by_name[n] for n in self._selected if n in names_by_name]
         return candidates
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "design-oligos-btn":
+            self.action_design_oligos()
 
     def action_design_oligos(self) -> None:
         candidates = self._selected_or_filtered_candidates()
