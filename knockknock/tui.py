@@ -254,6 +254,11 @@ class ExploreApp(App):
     #design-oligos-btn {
         margin-top: 1;
     }
+    #blast-selected-btn {
+        margin-top: 1;
+        background: $success;
+        color: white;
+    }
     """
 
     BINDINGS = [
@@ -355,11 +360,14 @@ class ExploreApp(App):
                 )
                 yield Checkbox("Sort by ΔG Score", value=False, id="sort-check")
                 yield Checkbox("Target all inputs", value=True, id="target-all-check")
+
             with Vertical(classes="filter-group"):
                 yield Static(" ")
-                yield Button(
-                    "Design Oligos", id="design-oligos-btn", variant="primary"
-                )
+                yield Button("Design Oligos", id="design-oligos-btn", variant="primary")
+
+            with Vertical(classes="filter-group"):
+                yield Static(" ")
+                yield Button("BLAST Selected Candidates", id="blast-selected-btn")
         # Row break lands between the filter/selection cluster and the
         # actions/app cluster in BINDINGS below — keep them in sync.
         yield TwoRowFooter(row_break="design_oligos")
@@ -714,6 +722,12 @@ class ExploreApp(App):
                 total_mrnas=self._total_mrnas,
             )
         )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "design-oligos-btn":
+            self.action_design_oligos()
+        elif event.button.id == "blast-selected-btn":
+            self.action_blast_selected()
 
     def action_blast_selected(self) -> None:
         """Open NCBI Nucleotide BLAST in the browser, prefilled with the
